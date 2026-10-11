@@ -24,15 +24,28 @@ spec:
       workspaces:
         - name: output
           workspace: shared-data
-    - name: test
-      runAfter: [clone-source]
+
+    - name: npm-install
+      runAfter:
+        - clone-source
       taskRef:
-        name: tax-calculator-test
+        name: npm
       workspaces:
         - name: source
           workspace: shared-data
+
+    - name: jasmine-tests
+      runAfter:
+        - npm-install
+      taskRef:
+        name: jasmine
+      workspaces:
+        - name: source
+          workspace: shared-data
+
     - name: build-push
-      runAfter: [test]
+      runAfter:
+        - jasmine-tests
       taskRef:
         name: tax-calculator-build-push
       params:
@@ -41,8 +54,10 @@ spec:
       workspaces:
         - name: source
           workspace: shared-data
+
     - name: deploy
-      runAfter: [build-push]
+      runAfter:
+        - build-push
       taskRef:
         name: tax-calculator-deploy-placeholder
       params:
