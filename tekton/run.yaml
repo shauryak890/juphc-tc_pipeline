@@ -7,7 +7,7 @@ spec:
     name: tax-calculator-ci-cd
   params:
     - name: REPO_URL
-      value: https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
+      value: https://github.com/shauryak890/juphc-tc_pipeline.git
     - name: IMAGE
       value: us.icr.io/YOUR_NAMESPACE/tax-calculator:v1
   workspaces:
@@ -16,7 +16,8 @@ spec:
         metadata:
           name: tax-calculator-workspace
         spec:
-          accessModes: ["ReadWriteOnce"]
+          accessModes:
+            - ReadWriteOnce
           resources:
             requests:
               storage: 1Gi
