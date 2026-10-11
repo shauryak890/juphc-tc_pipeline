@@ -1,0 +1,50 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: tax-calculator-ci-cd
+spec:
+  params:
+    - name: REPO_URL
+      type: string
+    - name: IMAGE
+      type: string
+  workspaces:
+    - name: shared-data
+  tasks:
+    - name: clone-source
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.REPO_URL)
+        - name: revision
+          value: main
+        - name: deleteExisting
+          value: "true"
+      workspaces:
+        - name: output
+          workspace: shared-data
+    - name: test
+      runAfter: [clone-source]
+      taskRef:
+        name: tax-calculator-test
+      workspaces:
+        - name: source
+          workspace: shared-data
+    - name: build-push
+      runAfter: [test]
+      taskRef:
+        name: tax-calculator-build-push
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
+      workspaces:
+        - name: source
+          workspace: shared-data
+    - name: deploy
+      runAfter: [build-push]
+      taskRef:
+        name: tax-calculator-deploy-placeholder
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)

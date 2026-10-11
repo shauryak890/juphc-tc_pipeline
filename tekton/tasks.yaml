@@ -1,0 +1,57 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: tax-calculator-test
+spec:
+  workspaces:
+    - name: source
+  steps:
+    - name: jasmine-tests
+      image: node:20-alpine
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/bin/sh
+        set -eu
+        npm ci
+        npm test
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: tax-calculator-build-push
+spec:
+  params:
+    - name: IMAGE
+      type: string
+  workspaces:
+    - name: source
+  steps:
+    - name: build-and-push
+      image: quay.io/buildah/stable:v1.35
+      workingDir: $(workspaces.source.path)
+      securityContext:
+        privileged: true
+      script: |
+        #!/bin/sh
+        set -eu
+        buildah bud --storage-driver=vfs -t "$(params.IMAGE)" .
+        buildah push --storage-driver=vfs "$(params.IMAGE)" "docker://$(params.IMAGE)"
+      # Configure IBM registry credentials in the Tekton environment before running.
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: tax-calculator-deploy-placeholder
+spec:
+  params:
+    - name: IMAGE
+      type: string
+  steps:
+    - name: deployment-instructions
+      image: alpine:3.20
+      script: |
+        #!/bin/sh
+        echo "Configure this task with the IBM Cloud service and credentials from your course lab."
+        echo "Image to deploy: $(params.IMAGE)"
+        echo "This placeholder intentionally does not claim to deploy to IBM Cloud."
+        exit 2

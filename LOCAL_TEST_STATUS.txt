@@ -1,0 +1,3 @@
+Automated tests were not run during package generation because dependency installation did not finish within the available execution window.
+Run `npm install` followed by `npm test` locally.
+This is not proof of IBM Cloud deployment.
