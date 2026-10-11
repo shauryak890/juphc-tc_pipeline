@@ -54,12 +54,3 @@ spec:
       workspaces:
         - name: source
           workspace: shared-data
-
-    - name: deploy
-      runAfter:
-        - build-push
-      taskRef:
-        name: tax-calculator-deploy-placeholder
-      params:
-        - name: IMAGE
-          value: $(params.IMAGE)
